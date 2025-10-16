@@ -65,17 +65,14 @@ public class GrpcClient implements HttpClient {
     } else {
       managedChannelBuilder.usePlaintext();
     }
+    Metadata metadata = new Metadata();
+    request.getHeaders().all().forEach(header ->
+          metadata.put(Metadata.Key.of(header.key(), Metadata.ASCII_STRING_MARSHALLER), header.firstValue())
+    );
+    ClientInterceptor clientInterceptor = MetadataUtils.newAttachHeadersInterceptor(metadata);
+    Channel channel = managedChannelBuilder.intercept(clientInterceptor).build();
 
-      HttpHeaders requestHeaders = request.getHeaders();
-      Metadata metadata = new Metadata();
-        for (HttpHeader header: requestHeaders.all()) {
-            metadata.put(Metadata.Key.of(header.key(), Metadata.ASCII_STRING_MARSHALLER), header.firstValue());
-        }
-      ClientInterceptor clientInterceptor = MetadataUtils.newAttachHeadersInterceptor(metadata);
-
-      Channel channel = managedChannelBuilder.intercept(clientInterceptor).build();
-
-      List<HttpHeader> headers = new ArrayList<>();
+    List<HttpHeader> headers = new ArrayList<>();
     headers.add(new HttpHeader("Content-Type", "application/json"));
     Response.Builder grpcRespBuilder = response();
     String statusName = Status.Code.OK.name();
