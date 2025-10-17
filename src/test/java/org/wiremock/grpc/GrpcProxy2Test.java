@@ -63,9 +63,9 @@ public class GrpcProxy2Test {
                                         .proxiedFrom("http://localhost:5088")));
 
 
-        String greeting = greetingsClient.greet("Tommi");
+        String greeting = greetingsClient.greet("Tommy");
 
-        assertThat(greeting, is("Hello from GRPC proxy, Tommi"));
+        assertThat(greeting, is("Hello from GRPC proxy, Tommy"));
     }
 
 }
